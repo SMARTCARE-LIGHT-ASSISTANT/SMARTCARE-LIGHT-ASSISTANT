@@ -1,0 +1,625 @@
+[
+    {
+        "id": "3ba489cdb1e630ad",
+        "type": "tab",
+        "label": "Light Assist",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "17ef720d74be035b",
+        "type": "ui_template",
+        "z": "3ba489cdb1e630ad",
+        "group": "a012d03f9bd2d14b",
+        "name": "",
+        "order": 12,
+        "width": 5,
+        "height": 4,
+        "format": "<style>\n  :root {\n    --main-bg: #121212;\n    --title-color: #64b5f6;         /* Bright blue */\n    --counter-up-color: #81c784;    /* Light green */\n    --counter-down-color: #e57373;  /* Light red */\n    --default-color: #ffb74d;       /* Light orange */\n    --text-color: #e0e0e0;\n  }\n\n  .counter-box {\n    background: var(--main-bg);\n    padding: 14px;\n    border-radius: 14px;\n    text-align: center;\n    box-shadow: 0 4px 15px rgba(0,0,0,0.7);\n    font-family: 'Segoe UI', sans-serif;\n    margin-top: 8px;\n    user-select: none;\n  }\n\n  .counter-title {\n    font-size: 24px;\n    color: var(--title-color);\n    margin-bottom: 6px;\n    font-weight: 700; /* Bold */\n  }\n\n  .counter-value {\n    font-size: 44px;\n    font-weight: 700;\n    transition: transform 0.25s ease-in-out;\n    color: var(--default-color);\n  }\n\n  .counter-value.animate {\n    transform: scale(1.15);\n  }\n\n  .counter-up {\n    color: var(--counter-up-color);\n  }\n\n  .counter-down {\n    color: var(--counter-down-color);\n  }\n</style>\n\n<div class=\"counter-box\">\n  <div class=\"counter-title\">Counter</div>\n  <div id=\"counter\" \n       class=\"counter-value\" \n       ng-class=\"{\n         'animate': animate, \n         'counter-up': direction === 'up', \n         'counter-down': direction === 'down'\n       }\"\n       ng-bind=\"msg.payload\">\n  </div>\n</div>\n\n<script>\n(function(scope) {\n  let lastValue = null;\n\n  function triggerAnimation() {\n    const el = document.getElementById(\"counter\");\n    el.classList.remove(\"animate\");\n    void el.offsetWidth; // force reflow\n    el.classList.add(\"animate\");\n  }\n\n  scope.$watch('msg.payload', function(newVal) {\n    if (lastValue !== null) {\n      if (newVal > lastValue) {\n        scope.direction = 'up';\n      } else if (newVal < lastValue) {\n        scope.direction = 'down';\n      } else {\n        scope.direction = null;\n      }\n    }\n    lastValue = newVal;\n    triggerAnimation();\n  });\n})(scope);\n</script>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 380,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8d185b9801aa244d",
+        "type": "ui_template",
+        "z": "3ba489cdb1e630ad",
+        "group": "a012d03f9bd2d14b",
+        "name": "",
+        "order": 14,
+        "width": 6,
+        "height": 4,
+        "format": "<style>\n  :root {\n    --bg-color: #121212;\n    --title-color: #90caf9;         /* Light Blue */\n    --low-color: #66bb6a;           /* Bright Green */\n    --medium-color: #ffa726;        /* Bright Orange */\n    --high-color: #ef5350;          /* Bright Red */\n    --inactive-color: #444444;      /* Dark Gray */\n    --text-color: #eeeeee;          /* Light Text */\n  }\n\n  .light-box {\n    background: var(--bg-color);\n    padding: 16px;\n    border-radius: 14px;\n    text-align: center;\n    box-shadow: 0 3px 10px rgba(0,0,0,0.7);\n    font-family: 'Segoe UI', sans-serif;\n    margin-top: 10px;\n    width: 220px;\n    user-select: none;\n    color: var(--text-color);\n  }\n\n  .light-title {\n    font-size: 24px;\n    color: var(--title-color);\n    margin-bottom: 14px;\n    font-weight: 600;\n  }\n\n  .light-levels {\n    display: flex;\n    justify-content: space-around;\n    margin-bottom: 12px;\n  }\n\n  .light-circle {\n    width: 40px;\n    height: 40px;\n    border-radius: 50%;\n    background-color: var(--inactive-color);\n    transition: background-color 0.4s ease;\n    box-shadow: 0 0 8px transparent;\n  }\n\n  @keyframes pulse {\n    0%, 100% {\n      box-shadow: 0 0 8px 2px transparent;\n      transform: scale(1);\n    }\n    50% {\n      box-shadow: 0 0 18px 6px currentColor;\n      transform: scale(1.1);\n    }\n  }\n\n  .light-circle.active-low {\n    background-color: var(--low-color);\n    color: var(--low-color);\n    animation: pulse 2s infinite ease-in-out;\n  }\n\n  .light-circle.active-medium {\n    background-color: var(--medium-color);\n    color: var(--medium-color);\n    animation: pulse 2s infinite ease-in-out;\n  }\n\n  .light-circle.active-high {\n    background-color: var(--high-color);\n    color: var(--high-color);\n    animation: pulse 2s infinite ease-in-out;\n  }\n\n  .level-label {\n    font-size: 20px;\n    font-weight: 600;\n    color: var(--text-color);\n    min-height: 28px;\n  }\n</style>\n\n<div class=\"light-box\">\n  <div class=\"light-title\">Light Mode</div>\n  <div class=\"light-levels\">\n    <div id=\"low\" class=\"light-circle\"></div>\n    <div id=\"medium\" class=\"light-circle\"></div>\n    <div id=\"high\" class=\"light-circle\"></div>\n  </div>\n  <div id=\"level-label\" class=\"level-label\">—</div>\n</div>\n\n<script>\n(function(scope) {\n  scope.$watch('msg.payload', function(level) {\n    const val = (typeof level === 'string') ? level.toLowerCase() : String(level).toLowerCase();\n\n    const low = document.getElementById('low');\n    const medium = document.getElementById('medium');\n    const high = document.getElementById('high');\n    const label = document.getElementById('level-label');\n\n    [low, medium, high].forEach(el => {\n      el.classList.remove('active-low', 'active-medium', 'active-high');\n    });\n\n    switch(val) {\n      case '0':\n        label.textContent = 'Light Off';\n        break;\n      case 'low':\n      case '1':\n        low.classList.add('active-low');\n        label.textContent = 'Low';\n        break;\n      case 'medium':\n      case '2':\n        medium.classList.add('active-medium');\n        label.textContent = 'Medium';\n        break;\n      case 'high':\n      case '3':\n        high.classList.add('active-high');\n        label.textContent = 'High';\n        break;\n      default:\n        label.textContent = 'Unknown';\n        break;\n    }\n  });\n})(scope);\n</script>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 440,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "269d1551fa171b50",
+        "type": "blynk-iot-out-write",
+        "z": "3ba489cdb1e630ad",
+        "name": "",
+        "pin": "0",
+        "pinmode": 0,
+        "client": "27597b9223ac5d38",
+        "x": 560,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "f747152d17b0196b",
+        "type": "blynk-iot-out-write",
+        "z": "3ba489cdb1e630ad",
+        "name": "",
+        "pin": "2",
+        "pinmode": 0,
+        "client": "27597b9223ac5d38",
+        "x": 700,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "1fb2525bde0abab0",
+        "type": "blynk-iot-out-write",
+        "z": "3ba489cdb1e630ad",
+        "name": "",
+        "pin": "1",
+        "pinmode": 0,
+        "client": "27597b9223ac5d38",
+        "x": 740,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "f66713623f5f5b99",
+        "type": "mqtt in",
+        "z": "3ba489cdb1e630ad",
+        "name": "",
+        "topic": "sla/g29/counter",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "c53dbbc73b4e4deb",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 180,
+        "y": 140,
+        "wires": [
+            [
+                "17ef720d74be035b",
+                "61b1e01eed23e2e3"
+            ]
+        ]
+    },
+    {
+        "id": "e3b85a4a9038eed0",
+        "type": "mqtt in",
+        "z": "3ba489cdb1e630ad",
+        "name": "",
+        "topic": "sla/g29/servo",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "c53dbbc73b4e4deb",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 190,
+        "y": 360,
+        "wires": [
+            [
+                "2f693b7d55b48e14",
+                "8b89a1fc73805394"
+            ]
+        ]
+    },
+    {
+        "id": "a64ea4d8e6699dba",
+        "type": "mqtt in",
+        "z": "3ba489cdb1e630ad",
+        "name": "",
+        "topic": "sla/g29/mode",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "c53dbbc73b4e4deb",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 190,
+        "y": 600,
+        "wires": [
+            [
+                "8d185b9801aa244d",
+                "cd634c776356dc45"
+            ]
+        ]
+    },
+    {
+        "id": "034da65d69467867",
+        "type": "ui_template",
+        "z": "3ba489cdb1e630ad",
+        "group": "a012d03f9bd2d14b",
+        "name": "",
+        "order": 1,
+        "width": 11,
+        "height": 3,
+        "format": "<link href=\"https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap\" rel=\"stylesheet\">\n\n<div class=\"clean-dark-clock\">\n  <div id=\"clock-time\">--:--:-- --</div>\n  <div id=\"clock-date\">Loading date...</div>\n</div>\n\n<script>\n  function updateClock() {\n    const now = new Date();\n\n    let hours = now.getHours();\n    const minutes = String(now.getMinutes()).padStart(2, '0');\n    const seconds = String(now.getSeconds()).padStart(2, '0');\n    const ampm = hours >= 12 ? 'PM' : 'AM';\n\n    hours = hours % 12;\n    hours = hours ? hours : 12;\n    hours = String(hours).padStart(2, '0');\n\n    const timeString = `${hours}:${minutes}:${seconds} ${ampm}`;\n    document.getElementById(\"clock-time\").textContent = timeString;\n\n    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };\n    document.getElementById(\"clock-date\").textContent = now.toLocaleDateString(undefined, options);\n  }\n\n  setInterval(updateClock, 1000);\n  updateClock();\n</script>\n\n<style>\n  .clean-dark-clock {\n    font-family: 'Segoe UI', sans-serif;\n    background: #121212;\n    padding: 20px;\n    border-radius: 12px;\n    text-align: center;\n    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);\n    border: 2px solid #333;\n  }\n\n  #clock-time {\n    font-size: 2em;\n    font-weight: bold;\n    color: #ffffff;\n    text-shadow: 0 0 5px #ffffff55, 0 0 10px #ffffff22;\n  }\n\n  #clock-date {\n    font-size: 0.85em;\n    margin-top: 8px;\n    color: #cccccc;\n    text-shadow: 0 0 3px #aaaaaa22;\n  }\n</style>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "fancy-clock",
+        "x": 200,
+        "y": 780,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2f693b7d55b48e14",
+        "type": "ui_gauge",
+        "z": "3ba489cdb1e630ad",
+        "name": "",
+        "group": "a012d03f9bd2d14b",
+        "order": 3,
+        "width": 6,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Curtain Angle",
+        "label": "units",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "90",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "fancy-clock",
+        "x": 400,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "9459dfb56b050d26",
+        "type": "function",
+        "z": "3ba489cdb1e630ad",
+        "name": "function 1",
+        "func": "let mode = flow.get(\"mode\");\nlet servo = flow.get(\"servo\");\nlet now = Date.now();  // current time in ms\n\n// Read saved tracking info or initialize\nlet lastTimestamp = flow.get(\"lastTimestamp\") || now;\nlet lastCondition = flow.get(\"lastCondition\") || \"none\"; // \"cond1\", \"cond2\", or \"none\"\n\nlet cond1Duration = flow.get(\"cond1Duration\") || 0;\nlet cond2Duration = flow.get(\"cond2Duration\") || 0;\n\n// Determine current condition\nlet currentCondition = \"none\";\nif (mode != 0 && servo === 0) {\n    currentCondition = \"cond1\";\n} else if (mode != 0 && servo != 0) {\n    currentCondition = \"cond2\";\n}\n\n// Calculate elapsed time since last message\nlet elapsed = now - lastTimestamp;\n\n// Accumulate elapsed time if condition unchanged and valid\nif (currentCondition === lastCondition && currentCondition !== \"none\") {\n    if (currentCondition === \"cond1\") {\n        cond1Duration += elapsed;\n    } else if (currentCondition === \"cond2\") {\n        cond2Duration += elapsed;\n    }\n} // else condition changed - no accumulation this cycle\n\n// Save updated tracking info back to flow context\nflow.set(\"lastTimestamp\", now);\nflow.set(\"lastCondition\", currentCondition);\nflow.set(\"cond1Duration\", cond1Duration);\nflow.set(\"cond2Duration\", cond2Duration);\n\n// Helper to format milliseconds to human-readable string\nfunction formatDuration(ms) {\n    let seconds = ms / 1000;\n\n    if (seconds < 60) {\n        return seconds.toFixed(2) + \" sec\";\n    } else if (seconds < 3600) {\n        let minutes = seconds / 60;\n        return minutes.toFixed(2) + \" min\";\n    } else {\n        let hours = seconds / 3600;\n        return hours.toFixed(2) + \" hr\";\n    }\n}\n\nmsg.payload = {\n    sunlight_usage: formatDuration(cond1Duration),\n    electricity_usage: formatDuration(cond2Duration)\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 920,
+        "wires": [
+            [
+                "0ac4dd2271f5cef0"
+            ]
+        ]
+    },
+    {
+        "id": "567582108639dba8",
+        "type": "inject",
+        "z": "3ba489cdb1e630ad",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "0.5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 920,
+        "wires": [
+            [
+                "9459dfb56b050d26"
+            ]
+        ]
+    },
+    {
+        "id": "61b1e01eed23e2e3",
+        "type": "change",
+        "z": "3ba489cdb1e630ad",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "counter",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 420,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8b89a1fc73805394",
+        "type": "change",
+        "z": "3ba489cdb1e630ad",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "servo",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 420,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cd634c776356dc45",
+        "type": "change",
+        "z": "3ba489cdb1e630ad",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "mode",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8df4ae918f76157d",
+        "type": "comment",
+        "z": "3ba489cdb1e630ad",
+        "name": "clock",
+        "info": "",
+        "x": 190,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "0ac4dd2271f5cef0",
+        "type": "ui_template",
+        "z": "3ba489cdb1e630ad",
+        "group": "a012d03f9bd2d14b",
+        "name": "",
+        "order": 9,
+        "width": 8,
+        "height": 5,
+        "format": "<style>\n  .usage-container {\n    background: #121212;\n    color: #eeeeee;\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    padding: 20px 30px;\n    border-radius: 12px;\n    max-width: 600px;\n    margin: auto;\n    box-shadow: 0 8px 16px rgba(0,0,0,0.8);\n  }\n  .usage-title {\n    font-size: 1.6rem;\n    font-weight: 700;\n    margin-bottom: 18px;\n    letter-spacing: 1.2px;\n    border-bottom: 1px solid #333;\n    padding-bottom: 10px;\n    text-align: center;\n  }\n  .usage-item {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    margin: 12px 0;\n    padding: 12px 20px;\n    border-radius: 8px;\n    background: #1e1e1e;\n    box-shadow: inset 0 0 6px #000;\n    transition: background 0.3s ease;\n  }\n  .usage-item:hover {\n    background: #2a2a2a;\n  }\n  .label {\n    font-weight: 600;\n    font-size: 1.1rem;\n    letter-spacing: 0.8px;\n  }\n  .value {\n    font-size: 1.3rem;\n    font-weight: 700;\n    padding: 6px 14px;\n    border-radius: 20px;\n    min-width: 100px;\n    text-align: center;\n    box-shadow: 0 0 10px rgba(0,0,0,0.5);\n  }\n  .electricity {\n    background: linear-gradient(135deg, #e53935, #b71c1c);\n    color: #fff;\n    box-shadow: 0 0 15px #e53935;\n  }\n  .sunlight {\n    background: linear-gradient(135deg, #66bb6a, #2e7d32);\n    color: #fff;\n    box-shadow: 0 0 15px #66bb6a;\n  }\n</style>\n\n<div class=\"usage-container\">\n  <div class=\"usage-title\">Smart Window Usage</div>\n  <div class=\"usage-item\">\n    <div class=\"label\">Electricity Usage</div>\n    <div id=\"electricityUsage\" class=\"value electricity\">--</div>\n  </div>\n  <div class=\"usage-item\">\n    <div class=\"label\">Sunlight Usage</div>\n    <div id=\"sunlightUsage\" class=\"value sunlight\">--</div>\n  </div>\n</div>\n\n<script>\n  (function(scope) {\n    scope.$watch('msg.payload', function(payload) {\n      if (!payload) return;\n\n      const elecEl = document.getElementById('electricityUsage');\n      const sunEl = document.getElementById('sunlightUsage');\n\n      elecEl.textContent = payload.electricity_usage || \"--\";\n      sunEl.textContent = payload.sunlight_usage || \"--\";\n    });\n  })(scope);\n</script>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 600,
+        "y": 920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2d8da1db94f891a7",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 2,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "43e9e4226c3cd633",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 4,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "5897a5a74b45ede8",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 5,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "8fe0409cc6e80596",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 6,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "f9e8110faa212ea5",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 7,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "8d2971466c59a3cb",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 8,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "1bc234c8b4de3f63",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 10,
+        "width": 4,
+        "height": 1
+    },
+    {
+        "id": "cbd0f766c929a087",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 11,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "80ebd3eca24b2d3d",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 13,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "5252c962edde05c2",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 15,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "3a06db638cabf2c7",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 16,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "9c0ff915c405a699",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 17,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "297101cd7a9ce8c3",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 18,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "c42a8dd6cdf79d18",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 20,
+        "width": 10,
+        "height": 1
+    },
+    {
+        "id": "8ed41a205b5cf4c9",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 21,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "b175a4bc50ccdadc",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 22,
+        "width": 10,
+        "height": 1
+    },
+    {
+        "id": "b6e8588d74494ff9",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 23,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "b3d027b401848ce1",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 24,
+        "width": 10,
+        "height": 1
+    },
+    {
+        "id": "0fafca84d5c76cc7",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 25,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "a912963cfa0c8815",
+        "type": "ui_spacer",
+        "z": "3ba489cdb1e630ad",
+        "name": "spacer",
+        "group": "a012d03f9bd2d14b",
+        "order": 26,
+        "width": 10,
+        "height": 1
+    },
+    {
+        "id": "a012d03f9bd2d14b",
+        "type": "ui_group",
+        "name": "Room No - 33",
+        "tab": "3d1499c34a954d66",
+        "order": 1,
+        "disp": true,
+        "width": 20,
+        "collapse": false,
+        "className": "<style>   .smart-header {     background-color: #1E88E5;     color: white;     padding: 10px;     border-radius: 10px;     text-align: center;     font-weight: bold;     font-size: 20px;     box-shadow: 0 0 10px rgba(0,0,0,0.2);   } </style>"
+    },
+    {
+        "id": "27597b9223ac5d38",
+        "type": "blynk-iot-client",
+        "name": "light_assist",
+        "path": "blynk.cloud",
+        "key": "vcMGmbcBocD61en6q7J9mUKErutp1XtO",
+        "tmpl": "TMPL67ezJ4BcF",
+        "dbg_all": false,
+        "dbg_log": false,
+        "dbg_prop": false,
+        "dbg_sync": false,
+        "dbg_low": false,
+        "dbg_pins": "",
+        "multi_cmd": false,
+        "enabled": true
+    },
+    {
+        "id": "c53dbbc73b4e4deb",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "broker.mqtt.cool",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "3d1499c34a954d66",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
