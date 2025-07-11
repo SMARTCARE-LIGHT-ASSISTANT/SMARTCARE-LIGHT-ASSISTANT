@@ -22,7 +22,7 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 380,
+        "x": 460,
         "y": 280,
         "wires": [
             []
@@ -57,8 +57,8 @@
         "pin": "0",
         "pinmode": 0,
         "client": "27597b9223ac5d38",
-        "x": 560,
-        "y": 200,
+        "x": 580,
+        "y": 180,
         "wires": []
     },
     {
@@ -205,14 +205,14 @@
         "type": "function",
         "z": "3ba489cdb1e630ad",
         "name": "function 1",
-        "func": "let mode = flow.get(\"mode\");\nlet servo = flow.get(\"servo\");\nlet now = Date.now();  // current time in ms\n\n// Read saved tracking info or initialize\nlet lastTimestamp = flow.get(\"lastTimestamp\") || now;\nlet lastCondition = flow.get(\"lastCondition\") || \"none\"; // \"cond1\", \"cond2\", or \"none\"\n\nlet cond1Duration = flow.get(\"cond1Duration\") || 0;\nlet cond2Duration = flow.get(\"cond2Duration\") || 0;\n\n// Determine current condition\nlet currentCondition = \"none\";\nif (mode != 0 && servo === 0) {\n    currentCondition = \"cond1\";\n} else if (mode != 0 && servo != 0) {\n    currentCondition = \"cond2\";\n}\n\n// Calculate elapsed time since last message\nlet elapsed = now - lastTimestamp;\n\n// Accumulate elapsed time if condition unchanged and valid\nif (currentCondition === lastCondition && currentCondition !== \"none\") {\n    if (currentCondition === \"cond1\") {\n        cond1Duration += elapsed;\n    } else if (currentCondition === \"cond2\") {\n        cond2Duration += elapsed;\n    }\n} // else condition changed - no accumulation this cycle\n\n// Save updated tracking info back to flow context\nflow.set(\"lastTimestamp\", now);\nflow.set(\"lastCondition\", currentCondition);\nflow.set(\"cond1Duration\", cond1Duration);\nflow.set(\"cond2Duration\", cond2Duration);\n\n// Helper to format milliseconds to human-readable string\nfunction formatDuration(ms) {\n    let seconds = ms / 1000;\n\n    if (seconds < 60) {\n        return seconds.toFixed(2) + \" sec\";\n    } else if (seconds < 3600) {\n        let minutes = seconds / 60;\n        return minutes.toFixed(2) + \" min\";\n    } else {\n        let hours = seconds / 3600;\n        return hours.toFixed(2) + \" hr\";\n    }\n}\n\nmsg.payload = {\n    sunlight_usage: formatDuration(cond1Duration),\n    electricity_usage: formatDuration(cond2Duration)\n};\n\nreturn msg;\n",
+        "func": "let mode = flow.get(\"mode\");\nlet servo = flow.get(\"servo\");\nlet now = Date.now();  // current time in ms\n\n// Read saved tracking info or initialize\nlet lastTimestamp = flow.get(\"lastTimestamp\") || now;\nlet lastCondition = flow.get(\"lastCondition\") || \"none\"; // \"cond1\", \"cond2\", or \"none\"\n\nlet cond1Duration = flow.get(\"cond1Duration\") || 0;\nlet cond2Duration = flow.get(\"cond2Duration\") || 0;\n\n// Determine current condition\nlet currentCondition = \"none\";\nif (mode != 0 && servo != 0) {\n    currentCondition = \"cond1\";\n} else if (mode != 0 && servo === 0) {\n    currentCondition = \"cond2\";\n}\n\n// Calculate elapsed time since last message\nlet elapsed = now - lastTimestamp;\n\n// Accumulate elapsed time if condition unchanged and valid\nif (currentCondition === lastCondition && currentCondition !== \"none\") {\n    if (currentCondition === \"cond1\") {\n        cond1Duration += elapsed;\n    } else if (currentCondition === \"cond2\") {\n        cond2Duration += elapsed;\n    }\n} // else condition changed - no accumulation this cycle\n\n// Save updated tracking info back to flow context\nflow.set(\"lastTimestamp\", now);\nflow.set(\"lastCondition\", currentCondition);\nflow.set(\"cond1Duration\", cond1Duration);\nflow.set(\"cond2Duration\", cond2Duration);\n\n// Helper to format milliseconds to human-readable string\nfunction formatDuration(ms) {\n    let seconds = ms / 1000;\n\n    if (seconds < 60) {\n        return seconds.toFixed(2) + \" sec\";\n    } else if (seconds < 3600) {\n        let minutes = seconds / 60;\n        return minutes.toFixed(2) + \" min\";\n    } else {\n        let hours = seconds / 3600;\n        return hours.toFixed(2) + \" hr\";\n    }\n}\n\nmsg.payload = {\n    sunlight_usage: formatDuration(cond1Duration),\n    electricity_usage: formatDuration(cond2Duration)\n};\n\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 320,
+        "x": 400,
         "y": 920,
         "wires": [
             [
@@ -351,6 +351,53 @@
         "className": "",
         "x": 600,
         "y": 920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "201f7a7cb82e8793",
+        "type": "inject",
+        "z": "3ba489cdb1e630ad",
+        "name": "Reset",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 1020,
+        "wires": [
+            [
+                "78a5c367eaf7092b"
+            ]
+        ]
+    },
+    {
+        "id": "78a5c367eaf7092b",
+        "type": "function",
+        "z": "3ba489cdb1e630ad",
+        "name": "function 2",
+        "func": "flow.set(\"cond1Duration\", 0);\nflow.set(\"cond2Duration\", 0);\nflow.set(\"servo\", 0);\nflow.set(\"mode\", 0);\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 1020,
         "wires": [
             []
         ]
@@ -616,7 +663,7 @@
     {
         "id": "3d1499c34a954d66",
         "type": "ui_tab",
-        "name": "Home",
+        "name": "Kandakadu Treatment and Rehabilitation Centre",
         "icon": "dashboard",
         "order": 1,
         "disabled": false,
